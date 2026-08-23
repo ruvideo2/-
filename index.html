@@ -115,6 +115,7 @@
         }
         .video-watch-area {
             flex: 2;
+            max-width: calc(100% - 320px);
         }
         .video-container {
             position: relative;
@@ -176,7 +177,122 @@
             border-radius: 20px;
             font-weight: 600;
             cursor: pointer;
+            transition: background 0.2s;
         }
+        .subscribe-btn:hover {
+            background-color: #d9d9d9;
+        }
+
+        /* ПАНЕЛЬ BASS BOOST */
+        .bass-boost-card {
+            background: linear-gradient(145deg, #1f1f1f, #151515);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .bb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .bb-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff4747;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Переключатель вкл/выкл */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider-toggle {
+            background-color: #ff0000;
+        }
+        input:checked + .slider-toggle:before {
+            transform: translateX(20px);
+        }
+
+        /* Пресеты */
+        .bb-presets {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            background: #2b2b2b;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .preset-btn:hover, .preset-btn.active {
+            background: #ff0000;
+            border-color: #ff0000;
+        }
+
+        /* Настройки ползунков */
+        .bb-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #aaa;
+        }
+        .control-label span {
+            color: #fff;
+            font-weight: bold;
+        }
+        input[type=range] {
+            width: 100%;
+            accent-color: #ff0000;
+            cursor: pointer;
+        }
+
         .video-stats {
             background-color: #272727;
             padding: 12px;
@@ -184,6 +300,7 @@
             font-size: 14px;
             color: #aaa;
             line-height: 1.5;
+            margin-top: 16px;
         }
         .video-stats span {
             color: #fff;
@@ -273,6 +390,35 @@
                         <button class="subscribe-btn">Подписаться</button>
                     </div>
 
+                    <!-- Панель настройки Bass Boost -->
+                    <div class="bass-boost-card">
+                        <div class="bb-header">
+                            <div class="bb-title">🔊 Усилитель Баса (Bass Boost Pro)</div>
+                            <label class="switch">
+                                <input type="checkbox" id="bbToggle" checked>
+                                <span class="slider-toggle"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="bb-presets">
+                            <button class="preset-btn" onclick="setPreset(0, 'Нормальный')">Стоковый</button>
+                            <button class="preset-btn active" onclick="setPreset(8, 'Кач')">Легкий кач</button>
+                            <button class="preset-btn" onclick="setPreset(16, 'Фонк')">Фонк 😈</button>
+                            <button class="preset-btn" onclick="setPreset(24, 'Максимум')">Максимум 🔥</button>
+                        </div>
+
+                        <div class="bb-controls">
+                            <div class="control-group">
+                                <div class="control-label">Усиление баса: <span id="gainVal">8 дБ</span></div>
+                                <input type="range" id="gainSlider" min="0" max="24" value="8" step="1" oninput="updateGain(this.value)">
+                            </div>
+                            <div class="control-group">
+                                <div class="control-label">Частота среза: <span id="freqVal">80 Гц</span></div>
+                                <input type="range" id="freqSlider" min="40" max="250" value="80" step="5" oninput="updateFreq(this.value)">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="video-stats">
                         <div>Просмотров: <span>14 733 202</span> | Лайков: <span>140 024</span></div>
                         <p style="margin-top: 8px;">Оригинальная ссылка на видео: <a href="http://www.youtube.com/watch?v=dj1V8RnuYcw" target="_blank" style="color: #3ea6ff;">youtube.com/watch?v=dj1V8RnuYcw</a></p>
@@ -301,5 +447,22 @@
         </div>
     </div>
 
+    <script>
+        function updateGain(val) {
+            document.getElementById('gainVal').innerText = val + ' дБ';
+        }
+        function updateFreq(val) {
+            document.getElementById('freqVal').innerText = val + ' Гц';
+        }
+        function setPreset(gain, name) {
+            document.getElementById('gainSlider').value = gain;
+            updateGain(gain);
+            
+            // Подсветка активной кнопки пресета
+            let buttons = document.querySelectorAll('.preset-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
